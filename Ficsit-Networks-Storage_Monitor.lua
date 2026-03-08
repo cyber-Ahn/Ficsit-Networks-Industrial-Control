@@ -1,3 +1,4 @@
+screen_name = "empty"
 --------------main functions-----------
 function tableConcat( t1, t2 )
     for i=1, #t2 do
@@ -117,6 +118,13 @@ function Vector2d.new( x, y )
     return o
 end
 
+function split(s, delimiter)
+ result = {};
+ for match in (s..delimiter):gmatch("(.-)"..delimiter) do
+  table.insert(result, match);
+ end
+ return result;
+end
 --------------GPU----------------------
 local gpu = computer.getPCIDevices( classes.GPU_T2_C )[1]
 if gpu == nil then
@@ -132,9 +140,22 @@ local screens = getComponentsByClassAndNick( {
 if #screens == 0 then
     computer.panic( "No screen found. Cannot continue." )
 end
-gpu:bindScreen( screens[1] )
-screenSize = gpu:getScreenSize()
-print( 'Screen resolution: ' .. screenSize.x .. 'x' .. screenSize.y )
+
+if screen_name ~= "empty" then
+	for i=1, #screens do
+		screen_data = screens[i]
+		screen_table_data = split(tostring(screen_data),'"')
+		if screen_name == screen_table_data[2] then
+			gpu:bindScreen( screens[i] )
+			screenSize = gpu:getScreenSize()
+			print( 'Screen resolution: ' .. screenSize.x .. 'x' .. screenSize.y )
+		end
+	end
+else
+	gpu:bindScreen( screens[1] )
+	screenSize = gpu:getScreenSize()
+	print( 'Screen resolution: ' .. screenSize.x .. 'x' .. screenSize.y )
+end
 --------------line calc----------------
 function get_line(line)
 	spacer = (size + 10) * line
@@ -163,7 +184,7 @@ function round(x)
   return math.floor(x + 0.5)
 end
 ----------Parameters------------------
-size = 50
+size = 48
 color_white = {1.000, 1.000, 1.000, 1.0}
 color_red = {1.000, 0.000, 0.000, 1.0}
 color_yellow = {1.000, 1.000, 0.000, 1.0}
@@ -173,11 +194,11 @@ h = screenSize.y
 ---------------------------------------
 function main()
 	while true do
-	draw_frame(0,1,119,"right",size,color_white)
-	draw_frame(0,2,36,"down",size,color_white)
-	draw_frame(119,2,36,"down",size,color_white)
-	draw_frame(60,2,36,"down",size,color_white)
-	draw_frame(0,38,119,"right",size,color_white)
+	draw_frame(0,1,129,"right",size,color_white)
+	draw_frame(0,2,40,"down",size,color_white)
+	draw_frame(129,2,40,"down",size,color_white)
+	draw_frame(68,2,40,"down",size,color_white)
+	draw_frame(0,40,129,"right",size,color_white)
 	gpu:drawText(Vector2d.new(get_row(50),get_line(0)),"Storage Monitor V3.2",size,color_white,TRUE)
 	local storage = component.proxy(component.findComponent("Storage"))
 	local fluid = component.proxy(component.findComponent("F_Storage"))
@@ -194,18 +215,18 @@ function main()
 			itemName = inv:getStack(0).item.type.name
 		end
 		gpu:drawText(Vector2d.new(get_row(2),get_line(i+1)),"Container_"..i,size,color_white,TRUE)
-		gpu:drawText(Vector2d.new(get_row(19),get_line(i+1)),itemName,size,color_white,TRUE)
+		gpu:drawText(Vector2d.new(get_row(20),get_line(i+1)),itemName,size,color_white,TRUE)
 		if (max/2) > amount then
-			gpu:drawText(Vector2d.new(get_row(44),get_line(i+1)),amount.."/"..max,size,color_red,TRUE)
+			gpu:drawText(Vector2d.new(get_row(51),get_line(i+1)),amount.."/"..max,size,color_red,TRUE)
 		end
 		if (max/2) < amount then
-			gpu:drawText(Vector2d.new(get_row(44),get_line(i+1)),amount.."/"..max,size,color_yellow,TRUE)
+			gpu:drawText(Vector2d.new(get_row(51),get_line(i+1)),amount.."/"..max,size,color_yellow,TRUE)
 		end
 		if amount == max then
-			gpu:drawText(Vector2d.new(get_row(44),get_line(i+1)),amount.."/"..max,size,color_green,TRUE)
+			gpu:drawText(Vector2d.new(get_row(51),get_line(i+1)),amount.."/"..max,size,color_green,TRUE)
 		end
 		if amount == 0 then
-			gpu:drawText(Vector2d.new(get_row(44),get_line(i+1)),amount.."/"..max,size,color_white,TRUE)
+			gpu:drawText(Vector2d.new(get_row(51),get_line(i+1)),amount.."/"..max,size,color_white,TRUE)
 		end	
 	end
 	for i=1, #fluid do
@@ -215,22 +236,22 @@ function main()
 		if isF > 1 then
 			itemName = fluid[i]:getFluidType().name
 		end
-		gpu:drawText(Vector2d.new(get_row(62),get_line(i+1)),"Fluid_"..i,size,color_white,TRUE)
-		gpu:drawText(Vector2d.new(get_row(72),get_line(i+1)),itemName,size,color_white,TRUE)		
+		gpu:drawText(Vector2d.new(get_row(70),get_line(i+1)),"Fluid_"..i,size,color_white,TRUE)
+		gpu:drawText(Vector2d.new(get_row(80),get_line(i+1)),itemName,size,color_white,TRUE)		
 		if (maxF/2) > isF then
-			gpu:drawText(Vector2d.new(get_row(106),get_line(i+1)),round(isF).."/"..round(maxF),size,color_red,TRUE)
+			gpu:drawText(Vector2d.new(get_row(114),get_line(i+1)),round(isF).."/"..round(maxF),size,color_red,TRUE)
 		end
 		if (maxF/2) < isF then
-			gpu:drawText(Vector2d.new(get_row(106),get_line(i+1)),round(isF).."/"..round(maxF),size,color_yellow,TRUE)
+			gpu:drawText(Vector2d.new(get_row(114),get_line(i+1)),round(isF).."/"..round(maxF),size,color_yellow,TRUE)
 		end
 		if isF == maxF then
-			gpu:drawText(Vector2d.new(get_row(106),get_line(i+1)),round(isF).."/"..round(maxF),size,color_green,TRUE)
+			gpu:drawText(Vector2d.new(get_row(114),get_line(i+1)),round(isF).."/"..round(maxF),size,color_green,TRUE)
 		end
 		if isF > maxF then
-			gpu:drawText(Vector2d.new(get_row(106),get_line(i+1)),round(isF).."/"..round(maxF),size,color_green,TRUE)
+			gpu:drawText(Vector2d.new(get_row(114),get_line(i+1)),round(isF).."/"..round(maxF),size,color_green,TRUE)
 		end
 		if isF == 0 then
-			gpu:drawText(Vector2d.new(get_row(106),get_line(i+1)),round(isF).."/"..round(maxF),size,color_white,TRUE)
+			gpu:drawText(Vector2d.new(get_row(114),get_line(i+1)),round(isF).."/"..round(maxF),size,color_white,TRUE)
 		end	
 	end
 	gpu:flush()
